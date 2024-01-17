@@ -53,6 +53,23 @@
 		    <artifactId>junit-jupiter-params</artifactId>
 		    <scope>test</scope>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>12.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents.client5</groupId>
+                    <artifactId>httpclient5</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents.core5</groupId>
+                    <artifactId>httpcore5</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 		
 		<!-- Choose your implementation -->
 <!-- 		<dependency> -->
@@ -78,4 +95,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 </project>

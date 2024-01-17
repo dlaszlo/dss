@@ -78,6 +78,8 @@ public final class DomUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DomUtils.class);
 
+	public static final boolean USE_SAXON = true;
+
 	/** Value used to pretty print xades signature */
 	public static final int TRANSFORMER_INDENT_NUMBER = 4;
 
@@ -370,13 +372,19 @@ public final class DomUtils {
 	 * @return string value of the XPath query
 	 */
 	public static String getValue(final Node xmlNode, final String xPathString) {
-		try {
-			final XPathExpression xPathExpression = createXPathExpression(xPathString);
-			final String string = (String) xPathExpression.evaluate(xmlNode, XPathConstants.STRING);
-			return Utils.trim(string);
-		} catch (XPathExpressionException e) {
-			throw new DSSException(String.format("Unable to extract value of the node. Reason : %s", e.getMessage()), e);
-		}
+		return XPathInspect.stopWatch("getValue", xPathString, () -> {
+			if (USE_SAXON) {
+				return SaxonUtils.getValue(xmlNode, xPathString);
+			} else {
+				try {
+					final XPathExpression xPathExpression = createXPathExpression(xPathString);
+					final String string = (String) xPathExpression.evaluate(xmlNode, XPathConstants.STRING);
+					return Utils.trim(string);
+				} catch (XPathExpressionException e) {
+					throw new DSSException(String.format("Unable to extract value of the node. Reason : %s", e.getMessage()), e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -389,13 +397,19 @@ public final class DomUtils {
 	 * @return the NodeList corresponding to the XPath query
 	 */
 	public static NodeList getNodeList(final Node xmlNode, final String xPathString) {
-		try {
-			final XPathExpression expr = createXPathExpression(xPathString);
-			return (NodeList) expr.evaluate(xmlNode, XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
-			throw new DSSException(String.format("Unable to find a NodeList by the given xPathString '%s'. Reason : %s",
-					xPathString, e.getMessage()), e);
-		}
+		return XPathInspect.stopWatch("getNodeList", xPathString, () -> {
+			if (USE_SAXON) {
+				return SaxonUtils.getNodeList(xmlNode, xPathString);
+			} else {
+				try {
+					final XPathExpression expr = createXPathExpression(xPathString);
+					return (NodeList) expr.evaluate(xmlNode, XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					throw new DSSException(String.format(
+							"Unable to find a NodeList by the given xPathString '%s'. Reason : %s", xPathString, e.getMessage()), e);
+				}
+			}
+		});
 	}
 
 	/**
